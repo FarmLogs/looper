@@ -88,5 +88,5 @@ Copyright © 2017 FarmLogs
 Distributed under the Eclipse Public License either version 2.0 or (at
 your option) any later version.
 
-[Failsafe]:
-[diehard]: 
+[Failsafe]: https://github.com/jhalterman/failsafe
+[diehard]: https://github.com/sunng87/diehard
