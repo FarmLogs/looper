@@ -12,7 +12,7 @@ TODO: expand on this
 If you are using clj-http already, you can just add a dependency on looper:
 
 ```clj
-[com.farmlogs/looper "0.1.0-SNAPSHOT"]
+[com.farmlogs/looper "0.1.0"]
 ```
 
 Then turn this:
