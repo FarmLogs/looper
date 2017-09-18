@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/org/documents/epl-2.0/"}
   :dependencies [[clj-http "3.7.0"]
                  [diehard "0.6.0"]]
+  :deploy-repositories [["releases" :clojars]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.8.0"]
                                   [org.clojure/tools.logging "0.4.0"]
                                   [ring/ring-jetty-adapter "1.6.2"]]}})
