@@ -1,4 +1,4 @@
-(defproject com.farmlogs/looper "0.1.0-SNAPSHOT"
+(defproject com.farmlogs/looper "0.1.0"
   :description "Drop-in clj-http replacement with retries"
   :url "https://github.com/FarmLogs/looper"
   :license {:name "Eclipse Public License"
