@@ -74,12 +74,38 @@ to the options map you pass to the get/post/etc function:
                                  :looper/options {:max-retries 3}})
 ```
 
+The following options can be overridden:
+
+* `:backoff-ms`: should be a vector of
+  `[intial-backoff-in-ms max-backoff-in-ms delay-factor]`. Default is
+  `[10 2000 4]`. See the
+  [diehard docs](https://sunng87.github.io/diehard/diehard.core.html#var-with-retry)
+  for more details.
+
+* `:max-retries`: number of retry attempts before giving up. Default
+  is `10`. Set to `nil` to retry forever.
+
+* `:on-failed-attempt`: a fn that will be passed a map of the form:
+```
+{:result result-of-call
+:exception exception
+:method method
+:url url
+:attempt attempt-number
+:elapsed time-elapsed-since-first-attempt}
+```
+The [default fn `log/warns`](src/looper/retry.clj#L14)
+
+* `:retry-if`: a fn that will be passed the result and exception (if
+  any), and should return truthy if the request should be
+  retried. [The default](src/looper/retry.clj#L5) only retries if
+  there is an exception and the exception has no status or has a
+  status >= 500.
+
 ## TODO
 
 * Add docstrings
-* More docs on what options are avalable
 * Add metrics(?)
-* More testing
 
 ## License
 

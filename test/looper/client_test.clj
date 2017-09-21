@@ -4,6 +4,10 @@
             [ring.adapter.jetty :as jetty]
             [clojure.tools.logging :as log]))
 
+(defn disable-logging []
+  (alter-var-root #'looper.retry/default-options
+                  #(dissoc % :on-failed-attempt)))
+
 (defmacro with-server [[url-sym handler] & body]
   `(let [server# (jetty/run-jetty
                    ~handler
@@ -11,6 +15,7 @@
                     :join? false})
          ~url-sym (str (.getURI server#))]
      (try
+       (disable-logging)
        ~@body
        (finally (.stop server#)))))
 
@@ -23,11 +28,9 @@
   (let [retry-count (atom 0)]
     (with-server [url (fn [_]
                       (swap! retry-count inc)
-                      (doto
-                          (if (= 2 @retry-count)
-                              {:status 202}
-                              {:status 500})
-                        println))]
+                        (if (= 2 @retry-count)
+                          {:status 202}
+                          {:status 500}))]
       (let [response (get url)]
         (is (= 202 (:status response)))
         (is (= 2 @retry-count))))))
@@ -57,12 +60,10 @@
 
 ;; TODO: figure out a way to test that this actually retries
 (deftest should-give-up-if-the-service-isn't-reachable
-  (let [retry-count (atom 0)
-        error (promise)]
-    (try
-      (get "http://non_existent" {:looper/options {:max-retries 2}})
-      (catch Exception e
-        (is (instance? java.net.UnknownHostException e))))))
+  (try
+    (get "http://non_existent" {:looper/options {:max-retries 2}})
+    (catch Exception e
+      (is (instance? java.net.UnknownHostException e)))))
 
 (deftest every-method-should-work
   (with-server [url (constantly {:status 202})]
@@ -70,3 +71,14 @@
       (testing method
         (let [response ((resolve (symbol "looper.client" (name method))) url)]
           (is (= 202 (:status response))))))))
+
+(deftest nil-max-retries-retries-indefinitely
+  (let [retry-count (atom 0)]
+    (try
+      (get "http://non_existent" {:looper/options
+                                  {:max-retries nil
+                                   :retry-if (fn [_ _] (< (swap! retry-count inc) 20))
+                                   :backoff-ms [1 2]}})
+      (catch Exception e
+        (is (instance? java.net.UnknownHostException e))))
+    (is (= 20 @retry-count))))
