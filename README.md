@@ -94,7 +94,9 @@ The following options can be overridden:
 :attempt attempt-number
 :elapsed time-elapsed-since-first-attempt}
 ```
-The [default fn `log/warns`](src/looper/retry.clj#L14)
+
+The [default fn `log/warns`](src/looper/retry.clj#L14) the exception
+along with the method, url, attempt count, and elapsed time.
 
 * `:retry-if`: a fn that will be passed the result and exception (if
   any), and should return truthy if the request should be
