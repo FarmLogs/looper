@@ -1,12 +1,8 @@
 (ns looper.client-test
+  (:refer-clojure :exclude [get])
   (:require [clojure.test :refer :all]
             [looper.client :refer :all]
-            [ring.adapter.jetty :as jetty]
-            [clojure.tools.logging :as log]))
-
-(defn disable-logging []
-  (alter-var-root #'looper.retry/default-options
-                  #(dissoc % :on-failed-attempt)))
+            [ring.adapter.jetty :as jetty]))
 
 (defmacro with-server [[url-sym handler] & body]
   `(let [server# (jetty/run-jetty
@@ -15,7 +11,6 @@
                     :join? false})
          ~url-sym (str (.getURI server#))]
      (try
-       (disable-logging)
        ~@body
        (finally (.stop server#)))))
 
