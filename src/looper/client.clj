@@ -6,15 +6,20 @@
 (defn with-retry
   ([method url]
    (with-retry method url nil))
-  ([method url {async? :async?
+  ([method url {async?           :async?
                 throw-exceptions :throw-exceptions
-                retry-opts :looper/options
-                :as opts}]
+                retry-opts       :looper/options
+                :as              opts}]
    (assert (not async?) "Async requests aren't supported")
-   (assert (not (false? throw-exceptions)) "clj-http exceptions must be enabled")
-   (let [method-fn (resolve (symbol "clj-http.client" (name method)))
-         opts' (dissoc opts :looper/options)]
-     (retry/retry method url #(method-fn url opts') retry-opts))))
+   (let [suppress-exceptions? (false? throw-exceptions)
+         method-fn            (resolve (symbol "clj-http.client" (name method)))
+         opts'                (dissoc opts :looper/options :throw-exceptions)]
+     (try
+       (retry/retry method url #(method-fn url opts') retry-opts)
+       (catch Exception e
+         (if suppress-exceptions?
+           (ex-data e)
+           (throw e)))))))
 
 (def get
   "Replacement for clj-http.client/get, but with retries."

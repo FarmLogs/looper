@@ -47,6 +47,7 @@
           (is (= 400 (-> e ex-data :status)))
           (is (= 1 @retry-count)))))))
 
+
 (deftest should-give-up-if-the-service-is-always-unavailable
   (let [retry-count (atom 0)
         error (promise)]
@@ -57,6 +58,15 @@
         (get url {:looper/options {:max-retries 2}})
         (catch Exception e
           (is (= 3 @retry-count)))))))
+
+(deftest should-not-throw-when-exceptions-disabled
+  (let [retry-count (atom 0)
+        error (promise)]
+    (with-server [url (fn [_]
+                        {:status 500})]
+      (let [response (get url {:throw-exceptions false
+                               :looper/options {:max-retries 2}})]
+        (is (= 500 (:status response)))))))
 
 ;; TODO: figure out a way to test that this actually retries
 (deftest should-give-up-if-the-service-isn't-reachable
