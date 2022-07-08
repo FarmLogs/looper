@@ -7,6 +7,11 @@ A Clojure library that provides retries around clj-http http calls.
 Shit's brittle.
 TODO: expand on this
 
+## pre-commit
+
+- Install: https://pre-commit.com/
+- running locally: This will also happen automatically before committing to a branch, but you can also run the tasks with `pre-commit run --all-files`
+
 ## Usage
 
 If you are using clj-http already, you can just add a dependency on looper:
